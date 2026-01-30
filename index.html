@@ -17,7 +17,7 @@
         playsinline
       ></video>
 
-      <div class="loop-stage" id="loopStage" aria-hidden="true">
+      <div class="loop-stage is-active" id="loopStage" aria-hidden="false">
         <div class="dream-field" id="dreamField" aria-hidden="true"></div>
         <div class="loop-video-wrapper">
           <video
@@ -27,9 +27,13 @@
             autoplay
             loop
             muted
+            preload="auto"
             playsinline
           ></video>
         </div>
+        <p class="video-alert" id="loopVideoAlert" role="status" aria-live="polite">
+          The loop video could not be loaded. Check the file name or browser codec support.
+        </p>
       </div>
     </main>
 
