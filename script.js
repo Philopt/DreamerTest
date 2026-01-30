@@ -49,6 +49,13 @@ const parsePositionValue = (value, axis) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const getSpinAfterBounce = (velocityX, velocityY) => {
+  const speed = Math.hypot(velocityX, velocityY);
+  const normalized = clampValue(speed / 4, 0.4, 1.1);
+  const direction = velocityX * velocityY >= 0 ? 1 : -1;
+  return direction * (0.6 + normalized);
+};
+
 const startBouncingMotion = ({ wrapper, drifter, video, config }) => {
   const bounds = () => loopStage.getBoundingClientRect();
   const state = {
@@ -86,13 +93,21 @@ const startBouncingMotion = ({ wrapper, drifter, video, config }) => {
     state.x += state.vx * delta;
     state.y += state.vy * delta;
 
+    let bounced = false;
     if (state.x <= 0 || state.x + videoWidth >= boundsWidth) {
       state.x = clampValue(state.x, 0, boundsWidth - videoWidth);
       state.vx *= -1;
+      bounced = true;
     }
     if (state.y <= 0 || state.y + videoHeight >= boundsHeight) {
       state.y = clampValue(state.y, 0, boundsHeight - videoHeight);
       state.vy *= -1;
+      bounced = true;
+    }
+    if (bounced) {
+      state.spin = true;
+      state.rotationSpeed = getSpinAfterBounce(state.vx, state.vy);
+      state.nextRotationChange = time + 600 + Math.random() * 900;
     }
 
     const centerX = state.x + videoWidth / 2;
@@ -118,13 +133,13 @@ const startBouncingMotion = ({ wrapper, drifter, video, config }) => {
 
     if (state.spin && time >= state.nextRotationChange) {
       const direction = Math.random() > 0.5 ? 1 : -1;
-      const magnitude = 1 + Math.random() * 4.5;
+      const magnitude = 0.4 + Math.random() * 1.6;
       state.rotationSpeed = direction * magnitude;
-      state.nextRotationChange = time + 900 + Math.random() * 1200;
+      state.nextRotationChange = time + 1200 + Math.random() * 1600;
     }
 
     if (state.spin) {
-      state.rotation += state.rotationSpeed * delta * 6;
+      state.rotation += state.rotationSpeed * delta * 2.8;
     }
 
     drifter.style.transform = `translate(${state.x + offsetX}px, ${state.y + offsetY}px)`;
@@ -189,7 +204,7 @@ const createLoopInstance = (
     wavy: true,
     spin: true,
     waveAmp: 32,
-    rotationSpeed: 1.2,
+    rotationSpeed: 0.6,
   };
 
   if (behavior === "wanderer") {
@@ -217,7 +232,7 @@ const createLoopInstance = (
       vy: Math.sin(angle) * baseSpeed * 2.2,
       scale: 0.33,
       wavy: false,
-      spin: false,
+      spin: true,
       waveAmp: 0,
       rotationSpeed: 0,
     };
@@ -251,7 +266,7 @@ const createLoopInstance = (
         state.wavyAfterCenter = false;
         state.spinAfterCenter = false;
         state.waveAmp = 34;
-        state.rotationSpeed = 1.4;
+        state.rotationSpeed = 0.8;
         video.style.setProperty("--scale", state.scale);
       }
       return;
