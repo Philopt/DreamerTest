@@ -6,6 +6,7 @@ const revealLoop = () => {
   loopStage.classList.add("is-active");
   introVideo.classList.add("is-hidden");
   introVideo.style.display = "none";
+  loopVideo.load();
   loopVideo.play().catch(() => {
     // Autoplay might be blocked; user interaction will start playback.
   });
