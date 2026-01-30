@@ -6,6 +6,7 @@ const loopVideoAlert = document.getElementById("loopVideoAlert");
 const introVideoAlert = document.getElementById("introVideoAlert");
 
 let dreamInterval = null;
+let dreamCardInterval = null;
 let loopRevealed = false;
 let dreamStarted = false;
 let dreamStartTimeout = null;
@@ -50,6 +51,82 @@ const spawnDreamWord = () => {
   word.addEventListener("animationend", () => {
     word.remove();
   });
+};
+
+const dreamCardConfigs = [
+  {
+    id: "bed",
+    src: "card-dream-bed.png",
+    emojis: ["🛏️", "😴", "🌙"],
+  },
+  {
+    id: "eye",
+    src: "card-dream-eye.png",
+    emojis: ["👁️", "✨", "🌀"],
+  },
+  {
+    id: "no-one",
+    src: "card-dream-no-one.png",
+    emojis: ["🚫", "👤", "🌫️"],
+  },
+];
+
+const spawnEmojiBurst = (x, y, emojis) => {
+  if (!dreamField) return;
+  emojis.forEach((emoji) => {
+    const emojiNode = document.createElement("span");
+    emojiNode.className = "dream-emoji";
+    emojiNode.textContent = emoji;
+    emojiNode.style.setProperty("--emoji-x", `${x}px`);
+    emojiNode.style.setProperty("--emoji-y", `${y}px`);
+    emojiNode.style.setProperty(
+      "--emoji-drift-x",
+      `${(Math.random() - 0.5) * 80}px`,
+    );
+    emojiNode.style.setProperty(
+      "--emoji-drift-y",
+      `${-60 - Math.random() * 60}px`,
+    );
+    dreamField.appendChild(emojiNode);
+    emojiNode.addEventListener("animationend", () => {
+      emojiNode.remove();
+    });
+  });
+};
+
+const spawnDreamCard = () => {
+  if (!dreamField) return;
+  const config =
+    dreamCardConfigs[Math.floor(Math.random() * dreamCardConfigs.length)];
+  const card = document.createElement("img");
+  card.className = "dream-card";
+  card.src = config.src;
+  card.alt = `Dream card ${config.id}`;
+
+  const startX = Math.random() * 100;
+  const drift = (Math.random() - 0.5) * 26;
+  const duration = 3.1 + Math.random() * 2.4;
+  const delay = Math.random() * 0.8;
+
+  card.style.setProperty("--start-x", `${startX}vw`);
+  card.style.setProperty("--drift-x", `${drift}vw`);
+  card.style.setProperty("--float-duration", `${duration}s`);
+  card.style.setProperty("--float-delay", `${delay}s`);
+
+  card.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    card.remove();
+    spawnEmojiBurst(centerX, centerY, config.emojis);
+  });
+
+  card.addEventListener("animationend", () => {
+    card.remove();
+  });
+
+  dreamField.appendChild(card);
 };
 
 const clampValue = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -343,6 +420,8 @@ const startDreamField = () => {
   dreamField.classList.add("is-active");
   spawnDreamWord();
   dreamInterval = window.setInterval(spawnDreamWord, 250);
+  spawnDreamCard();
+  dreamCardInterval = window.setInterval(spawnDreamCard, 1800);
 };
 
 introVideo.addEventListener("ended", revealLoop);
@@ -399,6 +478,24 @@ introVideo.load();
 enableAlphaFallbackIfNeeded();
 
 loopStage.addEventListener("click", (event) => {
+  if (!loopStage) return;
+  const rect = loopStage.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+  const baseAngle = Math.random() * Math.PI * 2;
+  [0, 1, 2].forEach((index) => {
+    const angle = baseAngle + index * (Math.PI * 2) / 3 + (Math.random() - 0.5) * 0.4;
+    createLoopInstance({
+      spawnX: clickX,
+      spawnY: clickY,
+      behavior: "spark",
+      direction: angle,
+    });
+  });
+});
+
+dreamField.addEventListener("click", (event) => {
+  if (!loopStage) return;
   const rect = loopStage.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
   const clickY = event.clientY - rect.top;
