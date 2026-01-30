@@ -3,6 +3,7 @@ const loopStage = document.getElementById("loopStage");
 const dreamField = document.getElementById("dreamField");
 const loopVideoLayer = document.getElementById("loopVideoLayer");
 const loopVideoAlert = document.getElementById("loopVideoAlert");
+const introVideoAlert = document.getElementById("introVideoAlert");
 
 let dreamInterval = null;
 let loopRevealed = false;
@@ -126,6 +127,18 @@ const startDreamField = () => {
 
 introVideo.addEventListener("ended", revealLoop);
 
+introVideo.addEventListener("loadeddata", () => {
+  if (introVideoAlert) {
+    introVideoAlert.classList.remove("is-visible");
+  }
+});
+
+introVideo.addEventListener("error", () => {
+  if (introVideoAlert) {
+    introVideoAlert.classList.add("is-visible");
+  }
+});
+
 const scheduleDreamStart = () => {
   if (dreamStarted) return;
   const duration = introVideo.duration;
@@ -160,6 +173,9 @@ introVideo.addEventListener("timeupdate", () => {
 if (introVideo.readyState >= 1) {
   scheduleDreamStart();
 }
+
+introVideo.src = "DreamGameIntro.mp4";
+introVideo.load();
 
 loopStage.addEventListener("click", () => {
   createLoopInstance();

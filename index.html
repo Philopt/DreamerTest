@@ -11,11 +11,15 @@
       <video
         class="intro-video"
         id="introVideo"
-        src="DreamGameIntro.mp4"
         autoplay
         muted
         playsinline
+        preload="auto"
       ></video>
+
+      <p class="video-alert" id="introVideoAlert" role="status" aria-live="polite">
+        The intro video could not be loaded. Check the file name or browser codec support.
+      </p>
 
       <div class="dream-field" id="dreamField" aria-hidden="true"></div>
 
