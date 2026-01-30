@@ -17,25 +17,10 @@
         playsinline
       ></video>
 
-      <div class="loop-stage is-active" id="loopStage" aria-hidden="false">
-        <div class="dream-field" id="dreamField" aria-hidden="true"></div>
-        <div class="loop-video-wrapper">
-          <video
-            class="loop-video"
-            id="loopVideo"
-            autoplay
-            loop
-            muted
-            preload="auto"
-            playsinline
-          >
-            <source
-              src="DreamGameElanorFalling_alpha.webm"
-              type="video/webm"
-            />
-            Your browser does not support the looping video.
-          </video>
-        </div>
+      <div class="dream-field" id="dreamField" aria-hidden="true"></div>
+
+      <div class="loop-stage" id="loopStage" aria-hidden="true">
+        <div class="loop-video-layer" id="loopVideoLayer" aria-hidden="true"></div>
         <p class="video-alert" id="loopVideoAlert" role="status" aria-live="polite">
           The loop video could not be loaded. Check the file name or browser codec support.
         </p>

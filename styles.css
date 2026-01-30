@@ -44,8 +44,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0;
+  pointer-events: none;
   background: #000;
   overflow: hidden;
 }
@@ -59,30 +59,49 @@ body {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.dream-field.is-active {
+  opacity: 1;
 }
 
 .dream-word {
   position: absolute;
   left: var(--start-x, 50vw);
-  bottom: -10vh;
-  font-size: 18px;
+  bottom: -15vh;
+  font-size: 20px;
   letter-spacing: 4px;
   text-transform: lowercase;
   color: rgba(255, 255, 255, 0.75);
-  animation: float-up var(--float-duration, 8s) ease-in forwards;
+  animation: float-up var(--float-duration, 3s) ease-out forwards;
   animation-delay: var(--float-delay, 0s);
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
+.loop-video-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
 .loop-video-wrapper {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  pointer-events: none;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  pointer-events: auto;
+  animation: drop-in 0.9s ease-out forwards;
+  opacity: 0;
+}
+
+.loop-video-drifter {
+  transform: translate(var(--x1, 50vw), var(--y1, 40vh));
+  animation: drift var(--drift-duration, 16s) linear infinite;
 }
 
 .loop-video {
@@ -91,6 +110,8 @@ body {
   height: auto;
   display: block;
   object-fit: contain;
+  animation: spin var(--spin-duration, 8s) linear infinite;
+  transform: rotate(var(--start-rotation, 0deg));
 }
 
 .video-alert {
@@ -123,7 +144,39 @@ body {
     opacity: 0.9;
   }
   100% {
-    transform: translateX(var(--drift-x, 0)) translateY(-120vh);
+    transform: translateX(var(--drift-x, 0)) translateY(-130vh);
     opacity: 0;
+  }
+}
+
+@keyframes drop-in {
+  0% {
+    transform: translateY(-120vh);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(var(--x1, 50vw), var(--y1, 40vh));
+  }
+  50% {
+    transform: translate(var(--x2, 60vw), var(--y2, 50vh));
+  }
+  100% {
+    transform: translate(var(--x3, 30vw), var(--y3, 20vh));
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(var(--start-rotation, 0deg));
+  }
+  100% {
+    transform: rotate(calc(var(--start-rotation, 0deg) + 360deg));
   }
 }
