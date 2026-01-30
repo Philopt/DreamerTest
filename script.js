@@ -2,6 +2,7 @@ const introVideo = document.getElementById("introVideo");
 const loopStage = document.getElementById("loopStage");
 const loopVideo = document.getElementById("loopVideo");
 const dreamField = document.getElementById("dreamField");
+const loopVideoAlert = document.getElementById("loopVideoAlert");
 
 let dreamInterval = null;
 let loopRevealed = false;
@@ -52,8 +53,29 @@ const startDreamField = () => {
 
 introVideo.addEventListener("ended", revealLoop);
 
-if (introVideo.readyState >= 2 && introVideo.duration === 0) {
+const ensureLoopPlayback = () => {
   revealLoop();
+  loopVideo.play().catch(() => {
+    // Autoplay might be blocked; user interaction will start playback.
+  });
+};
+
+loopVideo.addEventListener("error", () => {
+  if (loopVideoAlert) {
+    loopVideoAlert.classList.add("is-visible");
+  }
+});
+
+loopVideo.addEventListener("loadeddata", () => {
+  if (loopVideoAlert) {
+    loopVideoAlert.classList.remove("is-visible");
+  }
+});
+
+window.addEventListener("DOMContentLoaded", ensureLoopPlayback);
+
+if (introVideo.readyState >= 2 && introVideo.duration === 0) {
+  ensureLoopPlayback();
 }
 
 revealLoop();

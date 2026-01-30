@@ -44,8 +44,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
   background: #000;
   overflow: hidden;
 }
@@ -86,11 +86,32 @@ body {
 }
 
 .loop-video {
-  width: 50vw;
-  max-width: 640px;
+  width: min(70vw, 900px);
+  max-height: 80vh;
   height: auto;
   display: block;
   object-fit: contain;
+}
+
+.video-alert {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+}
+
+.video-alert.is-visible {
+  opacity: 1;
 }
 
 @keyframes float-up {
