@@ -10,6 +10,13 @@ let loopRevealed = false;
 let dreamStarted = false;
 let dreamStartTimeout = null;
 const motionStates = new WeakMap();
+const prefersBlendFallback =
+  /iP(ad|hone|od)/.test(navigator.userAgent) ||
+  !document.createElement("video").canPlayType('video/webm; codecs="vp9"');
+
+if (prefersBlendFallback && loopStage) {
+  loopStage.classList.add("use-blend-fallback");
+}
 
 const enableAlphaFallbackIfNeeded = () => {
   if (!loopVideoLayer) return;
@@ -189,6 +196,7 @@ const createLoopInstance = (
   video.loop = true;
   video.muted = true;
   video.playsInline = true;
+  video.setAttribute("playsinline", "");
   video.preload = "auto";
 
   const source = document.createElement("source");
@@ -274,8 +282,9 @@ const createLoopInstance = (
   video.addEventListener("click", (event) => {
     event.stopPropagation();
     const rect = video.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const stageRect = loopStage.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2 - stageRect.left;
+    const centerY = rect.top + rect.height / 2 - stageRect.top;
     if (wrapper.dataset.behavior === "spark") {
       const state = motionStates.get(wrapper);
       if (state) {

@@ -117,12 +117,17 @@ body {
   height: auto;
   display: block;
   object-fit: contain;
+  background-color: transparent;
   transform: rotate(var(--spin-angle, var(--start-rotation, 0deg))) scale(var(--scale, 1));
   transition: transform 2.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   background-color: transparent;
 }
 
 .loop-video-layer.alpha-fallback .loop-video {
+  mix-blend-mode: screen;
+}
+
+.loop-stage.use-blend-fallback .loop-video {
   mix-blend-mode: screen;
 }
 
