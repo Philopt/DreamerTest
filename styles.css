@@ -131,6 +131,14 @@ body {
   mix-blend-mode: screen;
 }
 
+.loop-video-layer.alpha-fallback {
+  isolation: isolate;
+}
+
+.loop-stage.use-blend-fallback {
+  isolation: isolate;
+}
+
 .video-alert {
   position: absolute;
   bottom: 5vh;

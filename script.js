@@ -183,7 +183,7 @@ const createLoopInstance = (
   if (entering) {
     wrapper.classList.add("from-center");
   }
-  if (hasSpawnPoint && !entering) {
+  if (hasSpawnPoint && !entering && behavior !== "spark") {
     wrapper.classList.add("from-click");
   }
 
@@ -265,6 +265,8 @@ const createLoopInstance = (
       waveAmp: 0,
       rotationSpeed: 0,
     };
+    wrapper.style.animation = "none";
+    wrapper.style.opacity = "1";
   }
 
   video.addEventListener("error", () => {
@@ -396,9 +398,18 @@ introVideo.src = "DreamGameIntro.mp4";
 introVideo.load();
 enableAlphaFallbackIfNeeded();
 
-loopStage.addEventListener("click", () => {
-  createLoopInstance({
-    spawnX: "50vw",
-    spawnY: "50vh",
+loopStage.addEventListener("click", (event) => {
+  const rect = loopStage.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+  const baseAngle = Math.random() * Math.PI * 2;
+  [0, 1, 2].forEach((index) => {
+    const angle = baseAngle + index * (Math.PI * 2) / 3 + (Math.random() - 0.5) * 0.4;
+    createLoopInstance({
+      spawnX: clickX,
+      spawnY: clickY,
+      behavior: "spark",
+      direction: angle,
+    });
   });
 });
