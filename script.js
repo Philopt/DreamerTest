@@ -4,6 +4,7 @@ const loopVideo = document.getElementById("loopVideo");
 const dreamField = document.getElementById("dreamField");
 
 let dreamInterval = null;
+let loopRevealed = false;
 
 const spawnDreamWord = () => {
   if (!dreamField) return;
@@ -29,9 +30,13 @@ const spawnDreamWord = () => {
 };
 
 const revealLoop = () => {
+  if (loopRevealed) return;
+  loopRevealed = true;
   loopStage.classList.add("is-active");
+  loopStage.setAttribute("aria-hidden", "false");
   introVideo.classList.add("is-hidden");
   introVideo.style.display = "none";
+  introVideo.pause();
   startDreamField();
   loopVideo.load();
   loopVideo.play().catch(() => {
@@ -50,3 +55,5 @@ introVideo.addEventListener("ended", revealLoop);
 if (introVideo.readyState >= 2 && introVideo.duration === 0) {
   revealLoop();
 }
+
+revealLoop();
