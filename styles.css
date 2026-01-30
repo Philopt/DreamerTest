@@ -55,59 +55,83 @@ body {
   pointer-events: auto;
 }
 
-.loop-video {
-  width: 50vw;
-  max-width: 640px;
-  height: auto;
-  animation: drift 10s linear infinite;
-  z-index: 2;
-}
-
 .dream-field {
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: 1;
+  pointer-events: none;
 }
 
-.dream-text {
+.dream-word {
   position: absolute;
-  bottom: -2rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: clamp(14px, 2.5vw, 28px);
-  letter-spacing: 0.2em;
+  left: var(--start-x, 50vw);
+  bottom: -10vh;
+  font-size: 18px;
+  letter-spacing: 4px;
   text-transform: lowercase;
-  animation: float-up var(--float-duration, 8s) linear forwards;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
-  user-select: none;
-  pointer-events: none;
+  color: rgba(255, 255, 255, 0.75);
+  animation: float-up var(--float-duration, 8s) ease-in forwards;
+  animation-delay: var(--float-delay, 0s);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+.loop-video-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  animation: drift 16s ease-in-out infinite;
+}
+
+.loop-video {
+  width: 50vw;
+  max-width: 640px;
+  height: auto;
+  animation: sway 10s ease-in-out infinite;
 }
 
 @keyframes float-up {
   0% {
-    transform: translate(0, 0);
+    transform: translateX(0) translateY(0);
     opacity: 0;
   }
   10% {
-    opacity: 0.85;
+    opacity: 0.9;
   }
   100% {
-    transform: translate(var(--drift, 0px), -120vh);
+    transform: translateX(var(--drift-x, 0)) translateY(-120vh);
     opacity: 0;
   }
 }
 
 @keyframes drift {
   0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: translate(-50%, -50%) translate(0, 0);
   }
-  30% {
-    transform: translate(60px, -40px) scale(0.98) rotate(6deg);
+  25% {
+    transform: translate(-50%, -50%) translate(-6vw, -4vh);
   }
-  60% {
-    transform: translate(-40px, 30px) scale(1.03) rotate(-4deg);
+  50% {
+    transform: translate(-50%, -50%) translate(4vw, -8vh);
+  }
+  75% {
+    transform: translate(-50%, -50%) translate(8vw, 6vh);
   }
   100% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+}
+
+@keyframes sway {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(2deg) scale(1.03);
+  }
+  100% {
+    transform: rotate(-2deg) scale(1);
   }
 }
