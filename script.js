@@ -9,6 +9,7 @@ let dreamInterval = null;
 let loopRevealed = false;
 let dreamStarted = false;
 let dreamStartTimeout = null;
+const spinIntervals = new WeakMap();
 
 const spawnDreamWord = () => {
   if (!dreamField) return;
@@ -33,15 +34,43 @@ const spawnDreamWord = () => {
   });
 };
 
-const randomPosition = () => Math.floor(10 + Math.random() * 80);
+const randomPosition = (min = 5, max = 95) =>
+  Math.floor(min + Math.random() * (max - min));
 
-const createLoopInstance = ({ entering = false } = {}) => {
+const pxToVw = (value) => `${(value / window.innerWidth) * 100}vw`;
+const pxToVh = (value) => `${(value / window.innerHeight) * 100}vh`;
+
+const startRandomSpin = (video) => {
+  if (!video) return;
+  let currentRotation = Math.floor(Math.random() * 360);
+  video.style.setProperty("--spin-angle", `${currentRotation}deg`);
+
+  const updateSpin = () => {
+    const direction = Math.random() > 0.5 ? 1 : -1;
+    const magnitude = 120 + Math.random() * 240;
+    currentRotation += direction * magnitude;
+    video.style.setProperty("--spin-angle", `${currentRotation}deg`);
+  };
+
+  updateSpin();
+  const interval = window.setInterval(updateSpin, 2200 + Math.random() * 2200);
+  spinIntervals.set(video, interval);
+};
+
+const createLoopInstance = ({ entering = false, spawnX = null, spawnY = null } = {}) => {
   if (!loopVideoLayer) return;
   const wrapper = document.createElement("div");
   wrapper.className = "loop-video-wrapper";
-  if (!entering) {
+  const hasSpawnPoint = Boolean(spawnX && spawnY);
+  if (!entering && !hasSpawnPoint) {
     wrapper.style.animation = "none";
     wrapper.style.opacity = "1";
+  }
+  if (entering) {
+    wrapper.classList.add("from-center");
+  }
+  if (hasSpawnPoint && !entering) {
+    wrapper.classList.add("from-click");
   }
 
   const drifter = document.createElement("div");
@@ -60,14 +89,15 @@ const createLoopInstance = ({ entering = false } = {}) => {
   source.type = "video/webm";
   video.appendChild(source);
 
-  const x1 = `${randomPosition()}vw`;
-  const y1 = `${randomPosition()}vh`;
+  const x1 = spawnX || `${randomPosition(15, 85)}vw`;
+  const y1 = spawnY || `${randomPosition(20, 80)}vh`;
   const x2 = `${randomPosition()}vw`;
   const y2 = `${randomPosition()}vh`;
   const x3 = `${randomPosition()}vw`;
   const y3 = `${randomPosition()}vh`;
-  const driftDuration = 12 + Math.random() * 10;
-  const spinDuration = 4 + Math.random() * 6;
+  const x4 = `${randomPosition()}vw`;
+  const y4 = `${randomPosition()}vh`;
+  const driftDuration = 8 + Math.random() * 8;
   const startRotation = Math.floor(Math.random() * 360);
 
   drifter.style.setProperty("--x1", x1);
@@ -76,8 +106,9 @@ const createLoopInstance = ({ entering = false } = {}) => {
   drifter.style.setProperty("--y2", y2);
   drifter.style.setProperty("--x3", x3);
   drifter.style.setProperty("--y3", y3);
+  drifter.style.setProperty("--x4", x4);
+  drifter.style.setProperty("--y4", y4);
   drifter.style.setProperty("--drift-duration", `${driftDuration}s`);
-  video.style.setProperty("--spin-duration", `${spinDuration}s`);
   video.style.setProperty("--start-rotation", `${startRotation}deg`);
 
   video.addEventListener("error", () => {
@@ -94,12 +125,19 @@ const createLoopInstance = ({ entering = false } = {}) => {
 
   video.addEventListener("click", (event) => {
     event.stopPropagation();
-    createLoopInstance();
+    const rect = video.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    createLoopInstance({
+      spawnX: pxToVw(centerX),
+      spawnY: pxToVh(centerY),
+    });
   });
 
   drifter.appendChild(video);
   wrapper.appendChild(drifter);
   loopVideoLayer.appendChild(wrapper);
+  startRandomSpin(video);
 
   video.play().catch(() => {
     // Autoplay might be blocked; user interaction will start playback.
@@ -115,7 +153,7 @@ const revealLoop = () => {
   introVideo.style.display = "none";
   introVideo.pause();
   startDreamField();
-  createLoopInstance({ entering: true });
+  createLoopInstance({ entering: true, spawnX: "50vw", spawnY: "50vh" });
 };
 
 const startDreamField = () => {
@@ -178,5 +216,8 @@ introVideo.src = "DreamGameIntro.mp4";
 introVideo.load();
 
 loopStage.addEventListener("click", () => {
-  createLoopInstance();
+  createLoopInstance({
+    spawnX: "50vw",
+    spawnY: "50vh",
+  });
 });
