@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dream Game</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <video
+        class="intro-video"
+        id="introVideo"
+        src="DreamGameIntro.mp4"
+        autoplay
+        muted
+        playsinline
+      ></video>
+
+      <div class="loop-stage" id="loopStage" aria-hidden="true">
+        <video
+          class="loop-video"
+          id="loopVideo"
+          src="DreamGameEleanorFalling.mov"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
