@@ -82,14 +82,15 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  animation: drift 16s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .loop-video {
   width: 50vw;
   max-width: 640px;
   height: auto;
-  animation: sway 10s ease-in-out infinite;
+  display: block;
+  object-fit: contain;
 }
 
 @keyframes float-up {
@@ -103,35 +104,5 @@ body {
   100% {
     transform: translateX(var(--drift-x, 0)) translateY(-120vh);
     opacity: 0;
-  }
-}
-
-@keyframes drift {
-  0% {
-    transform: translate(-50%, -50%) translate(0, 0);
-  }
-  25% {
-    transform: translate(-50%, -50%) translate(-6vw, -4vh);
-  }
-  50% {
-    transform: translate(-50%, -50%) translate(4vw, -8vh);
-  }
-  75% {
-    transform: translate(-50%, -50%) translate(8vw, 6vh);
-  }
-  100% {
-    transform: translate(-50%, -50%) translate(0, 0);
-  }
-}
-
-@keyframes sway {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    transform: rotate(2deg) scale(1.03);
-  }
-  100% {
-    transform: rotate(-2deg) scale(1);
   }
 }
