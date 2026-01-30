@@ -11,6 +11,17 @@ let dreamStarted = false;
 let dreamStartTimeout = null;
 const motionStates = new WeakMap();
 
+const enableAlphaFallbackIfNeeded = () => {
+  if (!loopVideoLayer) return;
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isSafari =
+    /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+  if (isIOS || isSafari) {
+    loopVideoLayer.classList.add("alpha-fallback");
+  }
+};
+
 const spawnDreamWord = () => {
   if (!dreamField) return;
   const word = document.createElement("span");
@@ -186,8 +197,18 @@ const createLoopInstance = (
   video.appendChild(source);
 
   const bounds = loopStage.getBoundingClientRect();
-  const startX = spawnX ?? Math.random() * (bounds.width * 0.6) + bounds.width * 0.2;
-  const startY = spawnY ?? Math.random() * (bounds.height * 0.6) + bounds.height * 0.2;
+  const defaultX = Math.random() * (bounds.width * 0.6) + bounds.width * 0.2;
+  const defaultY = Math.random() * (bounds.height * 0.6) + bounds.height * 0.2;
+  const resolvedX =
+    spawnX === null || spawnX === undefined
+      ? defaultX
+      : parsePositionValue(spawnX) - bounds.left;
+  const resolvedY =
+    spawnY === null || spawnY === undefined
+      ? defaultY
+      : parsePositionValue(spawnY) - bounds.top;
+  const startX = clampValue(resolvedX, 0, bounds.width);
+  const startY = clampValue(resolvedY, 0, bounds.height);
 
   wrapper.dataset.behavior = behavior;
   if (behavior === "spark") {
@@ -196,8 +217,8 @@ const createLoopInstance = (
 
   const baseSpeed = Math.min(bounds.width, bounds.height) / 240;
   let motionConfig = {
-    x: parsePositionValue(startX),
-    y: parsePositionValue(startY),
+    x: startX,
+    y: startY,
     vx: (Math.random() > 0.5 ? 1 : -1) * baseSpeed,
     vy: (Math.random() > 0.5 ? 1 : -1) * baseSpeed,
     scale: 1,
@@ -209,8 +230,8 @@ const createLoopInstance = (
 
   if (behavior === "wanderer") {
     motionConfig = {
-      x: parsePositionValue(startX),
-      y: parsePositionValue(startY),
+      x: startX,
+      y: startY,
       vx: baseSpeed * 0.9,
       vy: baseSpeed * 1.2,
       scale: 1,
@@ -226,8 +247,8 @@ const createLoopInstance = (
   if (behavior === "spark") {
     const angle = direction ?? Math.random() * Math.PI * 2;
     motionConfig = {
-      x: parsePositionValue(startX),
-      y: parsePositionValue(startY),
+      x: startX,
+      y: startY,
       vx: Math.cos(angle) * baseSpeed * 2.2,
       vy: Math.sin(angle) * baseSpeed * 2.2,
       scale: 0.33,
@@ -304,14 +325,6 @@ const revealLoop = () => {
   introVideo.pause();
   startDreamField();
   createLoopInstance({ entering: true, spawnX: "50vw", spawnY: "50vh" });
-  window.setTimeout(() => {
-    const bounds = loopStage.getBoundingClientRect();
-    createLoopInstance({
-      spawnX: bounds.width * 0.33,
-      spawnY: bounds.height * 0.2,
-      behavior: "wanderer",
-    });
-  }, 600);
 };
 
 const startDreamField = () => {
@@ -372,6 +385,7 @@ if (introVideo.readyState >= 1) {
 
 introVideo.src = "DreamGameIntro.mp4";
 introVideo.load();
+enableAlphaFallbackIfNeeded();
 
 loopStage.addEventListener("click", () => {
   createLoopInstance({
